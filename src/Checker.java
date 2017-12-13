@@ -10,7 +10,7 @@ public class Checker {
 
     public static boolean checkBars()
     {
-        boolean newBars = Main.robot.getPixelColor(2400, 33).equals(barsColor);    //sprawdzanie czy paski hp i many są w odpowiednim miejscu
+        boolean newBars = Main.robot.getPixelColor((int)Main.screenSize.getWidth()-160, 33).equals(barsColor);    //sprawdzanie czy paski hp i many są w odpowiednim miejscu
         if (bars != newBars) {
             if (newBars)
                 System.out.println("Paski hp i many na odpowiednim miejscu.");
@@ -21,7 +21,7 @@ public class Checker {
         return newBars;
     }
 
-    private boolean checkColor()        //metoda sprawdzajaca warunek, ze pixel jest odpowiedniego koloru do wykonania akcji (dla healingu red musi byc mniejsze niz 150)
+    private boolean checkColor()        //metoda sprawdzajaca warunek, ze pixel jest odpowiedniego koloru do wykonania akcji (dla healingu czerwien pixela musi byc mniejsza niz 150 zeby stwierdzic ze pasek hp nie jest zapelniony w danym miejscu)
     {
         Pixel checkedPixel = Pixel.getPixel(pixel.x, pixel.y);
         if (checkedPixel.color.getRed() > pixel.color.getRed()      &&
