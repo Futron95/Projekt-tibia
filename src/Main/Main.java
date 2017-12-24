@@ -47,6 +47,24 @@ public class Main
 
             }
         });
-        checking.start();
+        //checking.start();
+
+        Thread attacking = new Thread(() ->
+        {
+           while(true)
+           {
+               if(Attacker.isMonsterPresent() && !Attacker.isAttacking()) {
+                   robot.keyPress(KeyEvent.VK_F3);
+                   System.out.println("Atakuje!");
+               }
+
+               try {
+                   Thread.sleep(r.nextInt(100));           //Sprawdzanie co 80-120 milisekund
+               } catch (InterruptedException e) {
+                   e.printStackTrace();
+               }
+           }
+        });
+        attacking.start();
     }
 }

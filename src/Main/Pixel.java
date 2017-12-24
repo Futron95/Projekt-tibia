@@ -7,6 +7,15 @@ public class Pixel {
     public int y;
     public Color color;
 
+    public static boolean checkPixel(int x, int y, int rgb)
+    {
+        int checkedPixel = Main.robot.getPixelColor(x,y).getRGB();
+        if (checkedPixel == rgb)
+            return true;
+        else
+            return false;
+    }
+
     public Pixel(Color color, int x, int y)
     {
         this.color = color;
