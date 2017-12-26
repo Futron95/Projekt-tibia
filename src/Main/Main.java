@@ -54,7 +54,9 @@ public class Main
            while(true)
            {
                if(Attacker.isMonsterPresent() && !Attacker.isAttacking()) {
+
                    robot.keyPress(KeyEvent.VK_F3);
+                   robot.keyRelease(KeyEvent.VK_F3);
                    System.out.println("Atakuje!");
                }
 

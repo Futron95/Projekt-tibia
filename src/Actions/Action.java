@@ -16,6 +16,7 @@ public abstract class Action {
         long newAction = System.currentTimeMillis();
         if (newAction-action.getActionTime()>action.coolDown) {
             Main.robot.keyPress(action.keyCode);
+            Main.robot.keyRelease(action.keyCode);
             return true;
         }
         return false;
