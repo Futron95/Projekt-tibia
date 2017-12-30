@@ -1,6 +1,9 @@
 package Main;
 
-import Actions.*;
+import Actions.Action;
+import Actions.HealingAction;
+import Actions.PotionAction;
+
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.Random;
@@ -10,6 +13,7 @@ public class Main
     public static Dimension screenSize;
     public static Robot robot;
     public static Random r;
+    public static boolean focused=false;
     private static int hpPercent=100;
     private static int manaPercent=100;
     private static Action exura;
@@ -26,9 +30,33 @@ public class Main
         healthPotion = new PotionAction(KeyEvent.VK_F4);
         manaPotion = new PotionAction(KeyEvent.VK_F2);
 
-        Thread checking = new Thread(() ->
+        Walker.fillVectorsList();
+
+        Thread focusChecking = new Thread(()->      //watek sprawdzajacy czy okno tibii jest aktywne
         {
-            while(true)
+            int i, color;
+            while(true) {
+                for (i = 24; i < 29; i++) {
+                    color = robot.getPixelColor(i, 7).getRGB();
+                    if (color != 0xFF000000) {                      //warunek potwierdzenia aktywnosci okna to sprawdzenie czy pixele 24,25,26,27,28 na 7 sa czarne
+                        focused = false;
+                        break;
+                    }
+                }
+                if (i == 29)
+                    focused = true;
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        focusChecking.start();
+
+        Thread barsChecking = new Thread(() ->
+        {
+            while(focused)
             {
                hpPercent = Checker.getHpPercent();
                manaPercent = Checker.getManaPercent();
@@ -47,11 +75,11 @@ public class Main
 
             }
         });
-        //checking.start();
+        //barsChecking.start();
 
         Thread attacking = new Thread(() ->
         {
-           while(true)
+           while(focused)
            {
                if(Attacker.isMonsterPresent() && !Attacker.isAttacking()) {
 
@@ -61,12 +89,13 @@ public class Main
                }
 
                try {
-                   Thread.sleep(r.nextInt(100));           //Sprawdzanie co 80-120 milisekund
+                   Thread.sleep(r.nextInt(100));
                } catch (InterruptedException e) {
                    e.printStackTrace();
                }
            }
         });
-        attacking.start();
+        //attacking.start();
+
     }
 }
