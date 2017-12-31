@@ -6,6 +6,7 @@ public class Pixel {
     public int x;
     public int y;
     public Color color;
+    public static final int GROUND_COLOR = 0xFF996633;
 
     public static boolean checkPixel(int x, int y, int rgb)
     {

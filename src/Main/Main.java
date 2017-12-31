@@ -3,22 +3,37 @@ package Main;
 import Actions.Action;
 import Actions.HealingAction;
 import Actions.PotionAction;
+import com.sun.org.apache.xpath.internal.SourceTree;
 
 import java.awt.*;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.Random;
+import java.util.Scanner;
 
 public class Main
 {
     public static Dimension screenSize;
     public static Robot robot;
     public static Random r;
-    public static boolean focused=false;
+    public static volatile boolean canWalk=false;           //volatile sprawia ze zmieniajac wartosc w jednym watku, inne watki widza ja
     private static int hpPercent=100;
     private static int manaPercent=100;
     private static Action exura;
     private static Action healthPotion;
     private static Action manaPotion;
+
+    public static boolean isFocused()
+    {
+        int i, color;
+        for (i = 24; i < 29; i++) {
+            color = robot.getPixelColor(i, 7).getRGB();
+            if (color != 0xFF000000) {                      //warunek potwierdzenia aktywnosci okna to sprawdzenie czy pixele 24,25,26,27,28 na 7 sa czarne
+                return false;
+            }
+        }
+        return true;
+    }
 
     public static void main(String[] args) throws Exception
     {
@@ -32,32 +47,13 @@ public class Main
 
         Walker.fillVectorsList();
 
-        Thread focusChecking = new Thread(()->      //watek sprawdzajacy czy okno tibii jest aktywne
-        {
-            int i, color;
-            while(true) {
-                for (i = 24; i < 29; i++) {
-                    color = robot.getPixelColor(i, 7).getRGB();
-                    if (color != 0xFF000000) {                      //warunek potwierdzenia aktywnosci okna to sprawdzenie czy pixele 24,25,26,27,28 na 7 sa czarne
-                        focused = false;
-                        break;
-                    }
-                }
-                if (i == 29)
-                    focused = true;
-                try {
-                    Thread.sleep(200);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        focusChecking.start();
-
         Thread barsChecking = new Thread(() ->
         {
-            while(focused)
+            while(true)
             {
+               if(!isFocused()) {
+                    continue;
+                }
                hpPercent = Checker.getHpPercent();
                manaPercent = Checker.getManaPercent();
                if (hpPercent<40)
@@ -75,17 +71,17 @@ public class Main
 
             }
         });
-        //barsChecking.start();
+        barsChecking.start();
 
         Thread attacking = new Thread(() ->
         {
-           while(focused)
+           while(true)
            {
+               if(!isFocused())
+                   continue;
                if(Attacker.isMonsterPresent() && !Attacker.isAttacking()) {
-
                    robot.keyPress(KeyEvent.VK_F3);
                    robot.keyRelease(KeyEvent.VK_F3);
-                   System.out.println("Atakuje!");
                }
 
                try {
@@ -95,7 +91,35 @@ public class Main
                }
            }
         });
-        //attacking.start();
+        attacking.start();
 
+        Thread walking = new Thread(()->
+        {
+           while(true)
+           {
+               if(isFocused() && canWalk && !Attacker.isAttacking() && !Walker.isWalking())
+                    Walker.walk();
+           }
+        });
+        walking.start();
+
+        String command;
+        Scanner sc = new Scanner(System.in);
+        while (true)
+        {
+            command = sc.next();
+            System.out.println();
+            if (command.equals("go"))
+                canWalk = true;
+            if (command.equals("x"))
+                canWalk = false;
+        }
+    }
+
+    public static void mouseClick(int x, int y)
+    {
+        robot.mouseMove(x,y);
+        robot.mousePress(InputEvent.BUTTON1_MASK);
+        robot.mouseRelease(InputEvent.BUTTON1_MASK);
     }
 }
