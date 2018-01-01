@@ -13,7 +13,6 @@ public class Walker {
     public static int lastWalkingVector = 0;
     private static int plusAngle, minusAngle;
     private static Rectangle screenRect = new Rectangle(Main.screenSize);
-    private static BufferedImage capture;
     public static ArrayList<Pixel> vectors = new ArrayList<Pixel>();    //lista punktow, ktore beda sprawdzane przy wyznaczaniu drogi
     public static void fillVectorsList()
     {
@@ -44,21 +43,15 @@ public class Walker {
 
     public static boolean isWalking()       //metoda sprawdzajaca czy postac sie porusza. najpierw aktualizuje informacje o kolorach punktow wokol postaci na minimapie a nastepnie 20 razy co 100ms sprawdza czy cos sie zmienilo
     {
+        BufferedImage capture;
         int i,j,color;
-
         capture = robot.createScreenCapture(screenRect);
         for(i = 0;i<vectors.size();i++)
         {
             vectors.get(i).color = new Color(capture.getRGB(vectors.get(i).x, vectors.get(i).y));
         }
-
-        for(i=0;i<20;i++)
+        for(i=0;i<10;i++)
         {
-            /*try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }*/
             capture = robot.createScreenCapture(screenRect);
             for(j = 0;j<vectors.size();j++)
             {
@@ -68,27 +61,23 @@ public class Walker {
                 }
             }
         }
-        System.out.println("is walking return false");
         return false;
     }
 
     public static boolean walk()
     {
-        System.out.println("Walk");
         plusAngle = lastWalkingVector;
         minusAngle = lastWalkingVector;
         Pixel pix;
-        capture = robot.createScreenCapture(screenRect);
+        BufferedImage capture = robot.createScreenCapture(screenRect);
         do          //petla szukajaca na minimapie pixela koloru gleby po ktorej mozna chodzic, wektory sa przegladane tak zeby na poczatku sprawdzic ostatnio uzyty a potem sprawdzac coraz szerzej
         {
             pix = vectors.get(plusAngle);
             if(capture.getRGB(pix.x, pix.y)==Pixel.GROUND_COLOR)
             {
-                System.out.println("kolor gleby znaleziony");
-                if(Attacker.isAttacking())
-                    return true;
                 Main.mouseClick(pix.x, pix.y);
                 if (isWalking()) {
+                    Attacker.attackFailed = false;
                     lastWalkingVector = plusAngle;
                     return true;
                 }
@@ -96,12 +85,10 @@ public class Walker {
             pix = vectors.get(minusAngle);
             if(minusAngle != plusAngle && capture.getRGB(pix.x, pix.y)==Pixel.GROUND_COLOR)
             {
-                System.out.println("kolor gleby znaleziony");
-                if(Attacker.isAttacking())
-                    return true;
                 Main.mouseClick(pix.x, pix.y);
                 if(isWalking())
                 {
+                    Attacker.attackFailed = false;
                     lastWalkingVector = minusAngle;
                     return true;
                 }
@@ -111,7 +98,6 @@ public class Walker {
             if (minusAngle<0)
                 minusAngle = vectors.size()-1;
         }while (plusAngle!=minusAngle);
-        System.out.println("walk return false");
         return false;
     }
 }

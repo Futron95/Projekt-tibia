@@ -1,12 +1,21 @@
 package Actions;
 
-import Main.*;
+import java.awt.*;
 
 public abstract class Action {
     public static long potionTime;
     public static long healingTime;
     public static long supportTime;
     public static long attackTime;
+    private static Robot robot;
+
+    static {
+        try {
+            robot = new Robot();
+        } catch (AWTException e) {
+            e.printStackTrace();
+        }
+    }
 
     public int keyCode;
     public int coolDown;
@@ -15,8 +24,8 @@ public abstract class Action {
     {
         long newAction = System.currentTimeMillis();
         if (newAction-action.getActionTime()>action.coolDown) {
-            Main.robot.keyPress(action.keyCode);
-            Main.robot.keyRelease(action.keyCode);
+            robot.keyPress(action.keyCode);
+            robot.keyRelease(action.keyCode);
             return true;
         }
         return false;
