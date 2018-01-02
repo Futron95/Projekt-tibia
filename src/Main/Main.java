@@ -17,6 +17,7 @@ public class Main
     public static Robot robot;
     public static Random r;
     private static Rectangle screenRect;
+    public static volatile BufferedImage capture;
     public static volatile boolean focused=false;
     public static volatile boolean canWalk=false;           //volatile sprawia ze wszystkie watki widza zmiane wartosci
     private static int hpPercent=100;
@@ -31,6 +32,7 @@ public class Main
         screenRect = new Rectangle(Main.screenSize);
         System.out.println("Wymiary ekranu: szerokosc "+screenSize.getWidth()+", wysokość "+screenSize.getHeight());
         robot = new Robot();
+        capture = robot.createScreenCapture(screenRect);
         r = new Random();
         exura = new HealingAction(KeyEvent.VK_F1);
         healthPotion = new PotionAction(KeyEvent.VK_F4);
@@ -41,22 +43,17 @@ public class Main
         Thread focusChecking = new Thread(() ->
         {
             int i, color;
-            long start;
-            BufferedImage capture;
-
             while (true) {
-                start = System.currentTimeMillis();
                 capture = robot.createScreenCapture(screenRect);
-                for (i = 24; i < 29; i++) {
+                for (i = 24; i < 28; i++) {
                     color = capture.getRGB(i, 7);
-                    if (color != 0xFF000000) {                      //warunek potwierdzenia aktywnosci okna to sprawdzenie czy pixele 24,25,26,27,28 na 7 sa czarne
+                    if (color != 0xFF000000) {                      //warunek potwierdzenia aktywnosci okna to sprawdzenie czy pixele 24,25,26,27 na 7 sa czarne
                         focused = false;
                         break;
                     }
                 }
-                if (i==29)
+                if (i==28)
                     focused = true;
-                System.out.println(System.currentTimeMillis()-start+" ms");
             }
         });
         focusChecking.start();
@@ -91,16 +88,16 @@ public class Main
 
         Thread attacking = new Thread(() ->
         {
+            boolean monsterPresent, attackFailed;
            while(true)
            {
-               if(!focused)
-                   continue;
-               if(Attacker.isMonsterPresent() && (!Attacker.isAttacking() || Attacker.isAttackFailed())) {
+               monsterPresent = Attacker.isMonsterPresent();
+               attackFailed = Attacker.isAttackFailed();
+               if(focused && monsterPresent && attackFailed) {
                    Attacker.attack();
                }
-
                try {
-                   Thread.sleep(r.nextInt(100));
+                   Thread.sleep(100);
                } catch (InterruptedException e) {
                    e.printStackTrace();
                }
@@ -113,7 +110,7 @@ public class Main
            while(true)
            {
                if(focused && canWalk && (!Attacker.isMonsterPresent() || Attacker.attackFailed) && !Walker.isWalking())
-                    Walker.walk();
+                  Walker.walk();
            }
         });
         walking.start();

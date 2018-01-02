@@ -1,42 +1,26 @@
 package Main;
 
-import java.awt.*;
 
 public class Pixel {
     public int x;
     public int y;
-    public Color color;
+    public int color;
     public static final int GROUND_COLOR = 0xFF996633;
 
     public static boolean checkPixel(int x, int y, int rgb)
     {
-        int checkedPixel = Main.robot.getPixelColor(x,y).getRGB();
+        int checkedPixel = Main.capture.getRGB(x,y);
         if (checkedPixel == rgb)
             return true;
         else
             return false;
     }
 
-    public Pixel(Color color, int x, int y)
+    public Pixel(int color, int x, int y)
     {
         this.color = color;
         this.x = x;
         this.y = y;
     }
 
-    public Pixel(int r, int g, int b, int x, int y)
-    {
-        this(new Color(r,g,b),x,y);
-    }
-
-    public static Pixel getPixel(int x, int y)
-    {
-        Pixel pixel = new Pixel(Main.robot.getPixelColor(x,y),x,y);
-        return pixel;
-    }
-
-    public void print()
-    {
-        System.out.println("R "+color.getRed()+", G "+color.getGreen()+", B "+color.getBlue());
-    }
 }

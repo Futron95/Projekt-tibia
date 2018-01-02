@@ -28,7 +28,7 @@ public class Attacker {
         int positionY = attackedY();
         if (positionY==0)
             return true;
-        int ahc = robot.getPixelColor(battleListPosition+1, positionY).getRGB();
+        int ahc = Main.capture.getRGB(battleListPosition+1, positionY);
         long time = System.currentTimeMillis();
         if (ahc != attackedHpColor)
         {
@@ -48,7 +48,7 @@ public class Attacker {
     {
         robot.keyPress(KeyEvent.VK_F3);
         robot.keyRelease(KeyEvent.VK_F3);
-        attackedHpColor = robot.getPixelColor(battleListPosition+1, attackedY()).getRGB();
+        attackedHpColor = Main.capture.getRGB(battleListPosition+1, attackedY());
         lastDamageTime = System.currentTimeMillis();
         //attackFailed = false;
     }
