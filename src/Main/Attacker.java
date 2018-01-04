@@ -47,10 +47,14 @@ public class Attacker {
     public static void attack()
     {
         robot.keyPress(KeyEvent.VK_F3);
+        try {
+            Thread.sleep(10);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         robot.keyRelease(KeyEvent.VK_F3);
         attackedHpColor = Main.capture.getRGB(battleListPosition+1, attackedY());
         lastDamageTime = System.currentTimeMillis();
-        //attackFailed = false;
     }
 
     public static boolean isMonsterPresent()    //sprawdza czy na battle liscie jest przynajmniej 1 potwor
@@ -63,21 +67,13 @@ public class Attacker {
 
     private static int attackedY()      //metoda zwracajaca wspolrzedna y atakowanego potwora w tabeli battle
     {
-        int x = (int)Main.screenSize.getWidth()-326;
         int y = 57;
-        while (Pixel.checkPixel(x,y,0xFF000000))
+        while (Pixel.checkPixel(battleListPosition,y,0xFF000000))
         {
-            if (Pixel.checkPixel(x-3,y,0xFFFF0000))
+            if (Pixel.checkPixel(battleListPosition-3,y,0xFFFF0000))
                 return y;
             y+=22;
         }
         return 0;
-    }
-
-    public static boolean isAttacking()
-    {
-        if(attackedY()>0)
-            return true;
-        return false;
     }
 }

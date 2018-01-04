@@ -8,6 +8,7 @@ import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -20,11 +21,7 @@ public class Main
     public static volatile BufferedImage capture;
     public static volatile boolean focused=false;
     public static volatile boolean canWalk=false;           //volatile sprawia ze wszystkie watki widza zmiane wartosci
-    private static int hpPercent=100;
-    private static int manaPercent=100;
-    private static Action exura;
-    private static Action healthPotion;
-    private static Action manaPotion;
+    private static ArrayList<Action> actionList;
 
     public static void main(String[] args) throws Exception
     {
@@ -34,10 +31,10 @@ public class Main
         robot = new Robot();
         capture = robot.createScreenCapture(screenRect);
         r = new Random();
-        exura = new HealingAction(KeyEvent.VK_F1);
-        healthPotion = new PotionAction(KeyEvent.VK_F4);
-        manaPotion = new PotionAction(KeyEvent.VK_F2);
-
+        actionList = new ArrayList<>();
+        actionList.add(new HealingAction("Exura", KeyEvent.VK_F1, 80, 100));
+        actionList.add(new PotionAction("Health potion", KeyEvent.VK_F4, 40, 100));
+        actionList.add(new PotionAction("Mana Potion", KeyEvent.VK_F2, 100, 30));
         Walker.fillVectorsList();
 
         Thread focusChecking = new Thread(() ->
@@ -58,62 +55,52 @@ public class Main
         });
         focusChecking.start();
 
-        Thread barsChecking = new Thread(() ->
+        Thread barsUpdate = new Thread(()->
         {
             while(true)
             {
-               if(!focused) {
+                if(!focused) {
                     continue;
                 }
-               hpPercent = Checker.getHpPercent();
-               if (hpPercent<40) {
-                   Action.perform(healthPotion);
-                   hpPercent = Checker.getHpPercent();
-               }
-               if (hpPercent<80)
-                   Action.perform(exura);
-               manaPercent = Checker.getManaPercent();
-               if (manaPercent<20)
-                   Action.perform(manaPotion);
-
+                Checker.updateHpPercent();
+                Checker.updateManaPercent();
                 try {
-                    Thread.sleep(r.nextInt(40)+80);           //Sprawdzanie co 80-120 milisekund
+                    Thread.sleep(20);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-
             }
         });
-        barsChecking.start();
+        barsUpdate.start();
 
-        Thread attacking = new Thread(() ->
+        Thread performingActions = new Thread(() ->
+        {
+            while(true)
+            {
+                if(!focused) {
+                    continue;
+                }
+                for (Action action:actionList) {
+                    if (action.activated)
+                        Action.perform(action);
+                }
+            }
+        });
+        performingActions.start();
+
+        Thread hunting = new Thread(()->
         {
             boolean monsterPresent, attackFailed;
-           while(true)
-           {
-               monsterPresent = Attacker.isMonsterPresent();
-               attackFailed = Attacker.isAttackFailed();
-               if(focused && monsterPresent && attackFailed) {
-                   Attacker.attack();
-               }
-               try {
-                   Thread.sleep(100);
-               } catch (InterruptedException e) {
-                   e.printStackTrace();
-               }
-           }
+            while(true) {
+                monsterPresent = Attacker.isMonsterPresent();
+                attackFailed = Attacker.isAttackFailed();       //zwraca true jezeli postac nie atakuje, lub atak sie nie udal (8 sekund bez zmiany koloru paska hp atakowanego potwora)
+                if(focused && monsterPresent && attackFailed)
+                    Attacker.attack();
+                if(focused && canWalk && (Attacker.attackFailed || !monsterPresent) && !Walker.isWalking())
+                    Walker.walk();
+            }
         });
-        attacking.start();
-
-        Thread walking = new Thread(()->
-        {
-           while(true)
-           {
-               if(focused && canWalk && (!Attacker.isMonsterPresent() || Attacker.attackFailed) && !Walker.isWalking())
-                  Walker.walk();
-           }
-        });
-        walking.start();
+        hunting.start();
 
         String command;
         Scanner sc = new Scanner(System.in);

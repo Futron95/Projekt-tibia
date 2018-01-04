@@ -2,12 +2,12 @@ package Actions;
 
 public class PotionAction extends Action {
 
-    public PotionAction(int keyCode) {
-        super(keyCode, 1000);
+    public PotionAction(String name, int keyCode, int maxHpToTrigger, int maxManaToTrigger) {
+        super(name, keyCode, maxHpToTrigger, maxManaToTrigger,1000);
     }
 
-    public PotionAction(int keyCode, int coolDown) {
-        super(keyCode, coolDown);
+    public PotionAction(String name, int keyCode, int maxHpToTrigger, int maxManaToTrigger, int coolDown) {
+        super(name, keyCode, maxHpToTrigger, maxManaToTrigger, coolDown);
     }
 
     public void setActionTime()

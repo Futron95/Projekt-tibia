@@ -2,12 +2,12 @@ package Actions;
 
 public class AttackAction extends Action {
 
-    public AttackAction(int keyCode) {
-        super(keyCode, 1000);
+    public AttackAction(String name, int keyCode, int maxHpToTrigger, int maxManaToTrigger) {
+        super(name, keyCode, maxHpToTrigger, maxManaToTrigger, 1000);
     }
 
-    public AttackAction(int keyCode, int coolDown) {
-        super(keyCode, coolDown);
+    public AttackAction(String name, int keyCode, int maxHpToTrigger, int maxManaToTrigger, int coolDown) {
+        super(name, keyCode, maxHpToTrigger, maxManaToTrigger, coolDown);
     }
 
     public void setActionTime()

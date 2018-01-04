@@ -2,12 +2,12 @@ package Actions;
 
 public class HealingAction extends Action {
 
-    public HealingAction(int keyCode) {
-        super(keyCode, 1000);
+    public HealingAction(String name, int keyCode, int maxHpToTrigger, int maxManaToTrigger) {
+        super(name, keyCode, maxHpToTrigger, maxManaToTrigger,1000);
     }
 
-    public HealingAction(int keyCode, int coolDown) {
-        super(keyCode, coolDown);
+    public HealingAction(String name, int keyCode, int maxHpToTrigger, int maxManaToTrigger, int coolDown) {
+        super(name, keyCode, maxHpToTrigger, maxManaToTrigger, coolDown);
     }
 
     public void setActionTime()
