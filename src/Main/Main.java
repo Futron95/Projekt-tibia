@@ -39,7 +39,7 @@ public class Main extends Application
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("gui.fxml"));
         primaryStage.setTitle("UltraBot v.1");
-        primaryStage.setScene(new Scene(root, 300, 275));
+        primaryStage.setScene(new Scene(root, 400, 350));
         primaryStage.show();
 
 
@@ -127,10 +127,10 @@ public class Main extends Application
 
         Thread mLeveling = new Thread(()->
         {
-            Action magicLeveling = new SupportAction("Exura", VK_F11, 50, 25);
+            Action magicLeveling = new SupportAction("Exura", VK_F10, 20000, 25);
             while(true){
                 if(magicLevel==true){
-                    magicLeveling.perform(magicLeveling);
+                    Action.perform(magicLeveling);
                     try {
                         Thread.sleep(3000);
                     } catch (InterruptedException e) {
