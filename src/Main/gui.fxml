@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.text.*?>
 <?import java.lang.*?>
 <?import java.util.*?>
 <?import javafx.scene.*?>
@@ -8,16 +9,65 @@
 
 <AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Main.Controller">
    <children>
-      <Label layoutX="14.0" layoutY="32.0" text="Auto Leveling" />
-      <Button fx:id="autoLevelButton" layoutX="113.0" layoutY="28.0" mnemonicParsing="false" onAction="#handle" text="Activate" />
-      <Button fx:id="autoMLevelButton" layoutX="148.0" layoutY="275.0" mnemonicParsing="false" onAction="#handleMLeveling" text="Activate" />
-      <Label layoutX="19.0" layoutY="279.0" text="Auto Magic Leveling" />
-      <Separator layoutX="14.0" layoutY="65.0" prefHeight="0.0" prefWidth="573.0" />
-      <TextField fx:id="spellHotkeyField" layoutX="103.0" layoutY="162.0" prefHeight="25.0" prefWidth="135.0" />
-      <TextField fx:id="foodHotkeyField" layoutX="103.0" layoutY="200.0" prefHeight="25.0" prefWidth="59.0" />
-      <TextField fx:id="manaField" layoutX="103.0" layoutY="237.0" prefHeight="25.0" prefWidth="59.0" />
-      <Label layoutX="24.0" layoutY="166.0" text="Spell Hotkey" />
-      <Label layoutX="23.0" layoutY="204.0" text="Food Hotkey" />
-      <Label layoutX="26.0" layoutY="241.0" text="Mana need" />
+      <TabPane prefHeight="400.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE">
+        <tabs>
+          <Tab text="Main">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <Label layoutX="31.0" layoutY="34.0" text="Auto Leveling" />
+                        <Button fx:id="autoLevelButton" layoutX="147.0" layoutY="30.0" mnemonicParsing="false" onAction="#handle" text="Activate" />
+                        <Button fx:id="autoMLevelButton" layoutX="177.0" layoutY="208.0" mnemonicParsing="false" onAction="#handleMLeveling" text="Activate" />
+                        <Label layoutX="43.0" layoutY="212.0" text="Auto Magic Leveling" />
+                        <Separator prefHeight="0.0" prefWidth="573.0" />
+                        <TextField fx:id="spellHotkeyField" layoutX="177.0" layoutY="136.0" prefHeight="25.0" prefWidth="135.0" />
+                        <TextField fx:id="foodHotkeyField" layoutX="177.0" layoutY="173.0" prefHeight="25.0" prefWidth="59.0" />
+                        <TextField fx:id="manaField" layoutX="178.0" layoutY="102.0" prefHeight="25.0" prefWidth="59.0" />
+                        <Label layoutX="84.0" layoutY="177.0" text="Spell Hotkey" />
+                        <Label layoutX="83.0" layoutY="140.0" text="Food Hotkey" />
+                        <Label layoutX="87.0" layoutY="106.0" text="Mana need" />
+                        <Separator layoutX="14.0" layoutY="63.0" prefHeight="0.0" prefWidth="573.0" />
+                        <Separator orientation="VERTICAL" prefHeight="153.0" prefWidth="10.0" />
+                     </children>
+                  </AnchorPane>
+            </content>
+          </Tab>
+          <Tab text="Actions">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <TableView fx:id="tabela" layoutX="14.0" layoutY="20.0" prefHeight="222.0" prefWidth="574.0">
+                          <columns>
+                            <TableColumn editable="false" prefWidth="87.0" text="Type " />
+                            <TableColumn editable="false" prefWidth="110.0" text="Name" />
+                              <TableColumn editable="false" prefWidth="84.0" text="Hotkey" />
+                              <TableColumn editable="false" prefWidth="69.0" text="Max HP" />
+                              <TableColumn editable="false" prefWidth="74.0" text="Max Mana" />
+                              <TableColumn editable="false" minWidth="7.0" prefWidth="73.0" text="Cooldown" />
+                              <TableColumn prefWidth="76.0" text="On / Off" />
+                          </columns>
+                        </TableView>
+                        <ComboBox fx:id="typeComboBox" layoutX="13.0" layoutY="323.0" prefHeight="25.0" prefWidth="115.0" />
+                        <Text layoutX="58.0" layoutY="311.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Type" />
+                        <Text layoutX="236.0" layoutY="311.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Hotkey" />
+                        <Text layoutX="306.0" layoutY="311.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Max HP" />
+                        <Text layoutX="369.0" layoutY="311.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Max Mana" />
+                        <Text layoutX="441.0" layoutY="311.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Cooldown" />
+                        <Button fx:id="addActionButton" layoutX="377.0" layoutY="257.0" mnemonicParsing="false" onAction="#addToTable" prefHeight="25.0" prefWidth="94.0" text="Add" />
+                        <Text layoutX="158.0" layoutY="311.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Name" />
+                        <TextField fx:id="nameField" layoutX="138.0" layoutY="323.0" prefHeight="25.0" prefWidth="77.0" />
+                        <TextField fx:id="hpField" layoutX="299.0" layoutY="323.0" prefHeight="25.0" prefWidth="54.0" />
+                        <TextField fx:id="manaField" layoutX="370.0" layoutY="323.0" prefHeight="25.0" prefWidth="54.0" />
+                        <TextField fx:id="cdField" layoutX="441.0" layoutY="323.0" prefHeight="25.0" prefWidth="54.0" />
+                        <ComboBox fx:id="boolComboBox" layoutX="514.0" layoutY="323.0" prefHeight="25.0" prefWidth="71.0" />
+                        <Text layoutX="523.0" layoutY="311.0" strokeType="OUTSIDE" strokeWidth="0.0" text="On / Off" />
+                        <Button fx:id="deleteActionButton" layoutX="496.0" layoutY="257.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="90.0" text="Delete" />
+                        <ComboBox fx:id="hotkeyComboBox" layoutX="224.0" layoutY="323.0" prefHeight="25.0" prefWidth="67.0" />
+                     </children>
+                  </AnchorPane>
+            </content>
+          </Tab>
+        </tabs>
+      </TabPane>
    </children>
 </AnchorPane>
