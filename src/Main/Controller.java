@@ -1,11 +1,12 @@
 package Main;
 
+import Actions.Action;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.awt.event.KeyEvent;
 
@@ -46,10 +47,39 @@ public class Controller {
     ComboBox hotkeyComboBox = new ComboBox();
 
     @FXML
-    TableView tabela = new TableView();
+    TableView<Action> tabela;
+
+    @FXML
+    TableColumn<Action, Action.ActionType> typeColumn;
+
+    @FXML
+    TableColumn<Action, String> nameColumn;
+
+    @FXML
+    TableColumn<Action, String> hotkeyColumn;
+
+    @FXML
+    TableColumn<Action, Integer> maxHpColumn;
+
+    @FXML
+    TableColumn<Action, Integer> maxManaColumn;
+
+    @FXML
+    TableColumn<Action, Integer> coolDownColumn;
+
+    @FXML
+    TableColumn<Action, Boolean> activatedColumn;
 
     @FXML
     public void initialize(){
+        typeColumn.setCellValueFactory(new PropertyValueFactory<Action, Action.ActionType>("actionType"));
+        nameColumn.setCellValueFactory(new PropertyValueFactory<Action, String>("name"));
+        hotkeyColumn.setCellValueFactory(new PropertyValueFactory<Action, String>("hotKey"));
+        maxHpColumn.setCellValueFactory(new PropertyValueFactory<Action, Integer>("maxHpToTrigger"));
+        maxManaColumn.setCellValueFactory(new PropertyValueFactory<Action, Integer>("maxManaToTrigger"));
+        coolDownColumn.setCellValueFactory(new PropertyValueFactory<Action, Integer>("coolDown"));
+        activatedColumn.setCellValueFactory(new PropertyValueFactory<Action, Boolean>("activated"));
+        tabela.setItems(getActions());
         boolComboBox.getItems().addAll(
                 "On",
                 "Off"
@@ -106,69 +136,51 @@ public class Controller {
         }
     }
 
+    public ObservableList<Action> getActions()
+    {
+        ObservableList<Action> actions = FXCollections.observableArrayList();
+        for (Action action: Main.actionList) {
+            actions.add(action);
+        }
+        return actions;
+    }
+
     public void addToTable(ActionEvent e){
         if(e.getSource()==addActionButton){
-            Action akcja = new Action();
-            akcja.type = typeComboBox.getValue().toString();
-            akcja.name = nameField.getText();
-
-            switch (hotkeyComboBox.getValue().toString()) {
-                case "F1":
-                    akcja.keyCode = KeyEvent.VK_F1;
-                    break;
-                case "F2":
-                    akcja.keyCode = KeyEvent.VK_F2;
-                    break;
-                case "F3":
-                    akcja.keyCode = KeyEvent.VK_F3;
-                    break;
-                case "F4":
-                    akcja.keyCode = KeyEvent.VK_F4;
-                    break;
-                case "F5":
-                    akcja.keyCode = KeyEvent.VK_F5;
-                    break;
-                case "F6":
-                    akcja.keyCode = KeyEvent.VK_F6;
-                    break;
-                case "F7":
-                    akcja.keyCode = KeyEvent.VK_F7;
-                    break;
-                case "F8":
-                    akcja.keyCode = KeyEvent.VK_F8;
-                    break;
-                case "F9":
-                    akcja.keyCode = KeyEvent.VK_F9;
-                    break;
-                case "F10":
-                    akcja.keyCode = KeyEvent.VK_F10;
-                    break;
-                case "F11":
-                    akcja.keyCode = KeyEvent.VK_F11;
-                    break;
-                case "F12":
-                    akcja.keyCode = KeyEvent.VK_F12;
-                    break;
-
+            Action.ActionType actionType = Action.ActionType.none;
+            String actionTypeName = typeComboBox.getValue().toString();
+            switch (actionTypeName)
+            {
+                case "Heal" : actionType = Action.ActionType.heal; break;
+                case "Attack" : actionType = Action.ActionType.attack; break;
+                case "Support" : actionType = Action.ActionType.support; break;
+                case "Potion" : actionType = Action.ActionType.potion; break;
+                case "None" : break;
             }
-            akcja.maxHpToTrigger = Integer.parseInt(hpField.getText());
-            akcja.maxManaToTrigger = Integer.parseInt(manaField.getText());
-            akcja.coolDown = Integer.parseInt(cdField.getText());
+            String actionName = nameField.getText();
+            if (actionName.length()==0)
+                actionName = "Action "+Integer.toString(Main.actionList.size());
+
+            String hotKey = hotkeyComboBox.getValue().toString();
+
+            int maxHpToTrigger, maxManaToTrigger, coolDown;
+            maxHpToTrigger = Integer.parseInt(hpField.getText());
+            maxManaToTrigger = Integer.parseInt(manaField.getText());
+            coolDown = Integer.parseInt(cdField.getText());
+            boolean activated;
             if(boolComboBox.getValue().equals("On"))
             {
-                akcja.activated = true;
+                activated = true;
             }else{
-                akcja.activated = false;
+                activated = false;
             }
-            tabela.getItems().add(akcja);
-
-            typeComboBox.setItems(null);
+            Action akcja = new Action(actionName, hotKey, maxHpToTrigger, maxManaToTrigger, actionType, coolDown, activated);
+            Main.actionList.add(akcja);
+            tabela.setItems(getActions());
             nameField.clear();
-            hotkeyComboBox.setItems(null);
             hpField.clear();
             manaField.clear();
             cdField.clear();
-            boolComboBox.setItems(null);
         }
     }
 }

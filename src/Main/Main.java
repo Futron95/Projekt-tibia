@@ -21,22 +21,19 @@ public class Main extends Application
     public static Dimension screenSize;
     public static Robot robot;
     public static Random r;
+
     private static Rectangle screenRect;
     public static volatile BufferedImage capture;
+    public static volatile boolean running = true;
     public static volatile boolean focused=false;
     public static volatile boolean canWalk=false;           //volatile sprawia ze wszystkie watki widza zmiane wartosci
     public static volatile boolean magicLevel = false;
     public static volatile boolean canHunt = false;
     public static volatile boolean canAntyKick = false;
-    private static ArrayList<Action> actionList;
+    public static ArrayList<Action> actionList;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("gui.fxml"));
-        primaryStage.setTitle("UltraBot v.1");
-        primaryStage.setScene(new Scene(root, 400, 350));
-        primaryStage.show();
-
 
         screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         screenRect = new Rectangle(Main.screenSize);
@@ -45,15 +42,19 @@ public class Main extends Application
         capture = robot.createScreenCapture(screenRect);
         r = new Random();
         actionList = new ArrayList<>();
-        actionList.add(new Action("Exura", KeyEvent.VK_F1, 80, 100, Action.ActionType.heal, 1000, true));
-        actionList.add(new Action("Health potion", KeyEvent.VK_F4, 40, 100, Action.ActionType.potion, 1000, true));
-        actionList.add(new Action("Mana Potion", KeyEvent.VK_F2, 100, 30, Action.ActionType.potion, 1000, true));
+        //actionList.add(new Action("Exura", "F1", 80, 100, Action.ActionType.heal, 1000, true));
+        actionList.add(new Action("Health potion", "F4", 40, 100, Action.ActionType.potion, 1000, true));
+        actionList.add(new Action("Mana Potion", "F2", 100, 30, Action.ActionType.potion, 1000, true));
+        Parent root = FXMLLoader.load(getClass().getResource("gui.fxml"));
+        primaryStage.setTitle("UltraBot v.1");
+        primaryStage.setScene(new Scene(root, 640, 480));
+        primaryStage.show();
         Walker.fillVectorsList();
 
         Thread focusChecking = new Thread(() ->
         {
             int i, color;
-            while (true) {
+            while (running) {
                 capture = robot.createScreenCapture(screenRect);
                 for (i = 24; i < 28; i++) {
                     color = capture.getRGB(i, 7);
@@ -71,7 +72,7 @@ public class Main extends Application
 
         Thread barsUpdate = new Thread(()->
         {
-            while(true)
+            while(running)
             {
                 if(!focused) {
                     continue;
@@ -90,13 +91,13 @@ public class Main extends Application
 
         Thread performingActions = new Thread(() ->
         {
-            while(true)
+            while(running)
             {
                 if(!focused) {
                     continue;
                 }
                 for (Action action:actionList) {
-                    if (action.activated)
+                    if (action.isActivated())
                         action.perform();
                 }
             }
@@ -106,7 +107,7 @@ public class Main extends Application
         Thread hunting = new Thread(()->
         {
             boolean monsterPresent, attackFailed;
-            while(true) {
+            while(running) {
                 if(canHunt==true)
                 {
                     monsterPresent = Attacker.isMonsterPresent();
@@ -122,9 +123,9 @@ public class Main extends Application
 
         Thread mLeveling = new Thread(()->
         {
-            Action magicLeveling = new Action("Exura", VK_F10, 100, 25, Action.ActionType.heal, 1000, true);
-            while(true){
-                if(magicLevel==true){
+            Action magicLeveling = new Action("Exura", "F10", 100, 25, Action.ActionType.heal, 1000, true);
+            while(running){
+                if(magicLevel && focused){
                     magicLeveling.perform();
                     try {
                         Thread.sleep(3000);
@@ -134,13 +135,13 @@ public class Main extends Application
                 }
             }
         });
-        mLeveling.start();
+        //mLeveling.start();
 
         Thread antyKick = new Thread(()->
         {
-            while (true)
+            while (running)
             {
-                if(canAntyKick=true)
+                if(canAntyKick && focused)
                 {
                     robot.keyPress(KeyEvent.VK_CONTROL);
                     robot.keyPress(KeyEvent.VK_UP);
@@ -162,26 +163,15 @@ public class Main extends Application
             }
 
         });
-        antyKick.start();
+        //antyKick.start();
 
-        /*String command;
-        Scanner sc = new Scanner(System.in);
-        System.out.println("Wpisz komende go, zeby wlaczyc chodzenie, lub x zeby je wylaczyc: ");
-        while (true)
+        primaryStage.setOnCloseRequest(e ->
         {
-            command = sc.next();
-            System.out.println();
-            if (command.equals("go")) {
-                canWalk = true;
-                System.out.println("Chodzenie wlaczone, wpisz x aby wylaczyc: ");
-            }
-            if (command.equals("x")) {
-                canWalk = false;
-                System.out.println("Chodzenie wylaczone, wpisz go aby wlaczyc: ");
-            }
-        }
-        */
+            running = false;
+        });
+
     }
+
 
     public static void main(String[] args) throws Exception
     {
