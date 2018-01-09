@@ -104,7 +104,6 @@ public class Controller {
                 "F10",
                 "F11",
                 "F12"
-
         );
     }
 
@@ -181,6 +180,25 @@ public class Controller {
             hpField.clear();
             manaField.clear();
             cdField.clear();
+        }
+    }
+
+    public void clickRow(){
+        Action akcja1 = tabela.getSelectionModel().getSelectedItem();
+        nameField.setText(akcja1.getName());
+        hpField.setText(Integer.toString(akcja1.getMaxHpToTrigger()));
+        manaField.setText(Integer.toString(akcja1.getMaxManaToTrigger()));
+        cdField.setText(Integer.toString(akcja1.getCoolDown()));
+        typeComboBox.setValue(akcja1.getActionType());
+        hotkeyComboBox.setValue(akcja1.getHotKey());
+        boolComboBox.setValue(akcja1.isActivated());
+    }
+
+    public void deleteSelectedRow(ActionEvent e){
+        if(e.getSource()==deleteActionButton){
+            Action akcja2 = tabela.getSelectionModel().getSelectedItem();
+            tabela.getItems().remove(akcja2);
+            Main.actionList.remove(akcja2);
         }
     }
 }
