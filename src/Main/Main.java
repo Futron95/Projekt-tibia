@@ -1,9 +1,6 @@
 package Main;
 
 import Actions.Action;
-import Actions.HealingAction;
-import Actions.PotionAction;
-import Actions.SupportAction;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -16,9 +13,7 @@ import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.Scanner;
 
-import static java.awt.event.InputEvent.CTRL_MASK;
 import static java.awt.event.KeyEvent.*;
 
 public class Main extends Application
@@ -50,9 +45,9 @@ public class Main extends Application
         capture = robot.createScreenCapture(screenRect);
         r = new Random();
         actionList = new ArrayList<>();
-        actionList.add(new HealingAction("Exura", KeyEvent.VK_F1, 80, 100));
-        actionList.add(new PotionAction("Health potion", KeyEvent.VK_F4, 40, 100));
-        actionList.add(new PotionAction("Mana Potion", KeyEvent.VK_F2, 100, 30));
+        actionList.add(new Action("Exura", KeyEvent.VK_F1, 80, 100, Action.ActionType.heal, 1000, true));
+        actionList.add(new Action("Health potion", KeyEvent.VK_F4, 40, 100, Action.ActionType.potion, 1000, true));
+        actionList.add(new Action("Mana Potion", KeyEvent.VK_F2, 100, 30, Action.ActionType.potion, 1000, true));
         Walker.fillVectorsList();
 
         Thread focusChecking = new Thread(() ->
@@ -102,7 +97,7 @@ public class Main extends Application
                 }
                 for (Action action:actionList) {
                     if (action.activated)
-                        Action.perform(action);
+                        action.perform();
                 }
             }
         });
@@ -127,10 +122,10 @@ public class Main extends Application
 
         Thread mLeveling = new Thread(()->
         {
-            Action magicLeveling = new SupportAction("Exura", VK_F10, 20000, 25);
+            Action magicLeveling = new Action("Exura", VK_F10, 100, 25, Action.ActionType.heal, 1000, true);
             while(true){
                 if(magicLevel==true){
-                    Action.perform(magicLeveling);
+                    magicLeveling.perform();
                     try {
                         Thread.sleep(3000);
                     } catch (InterruptedException e) {
