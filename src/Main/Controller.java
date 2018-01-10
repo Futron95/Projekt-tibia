@@ -191,7 +191,11 @@ public class Controller {
         cdField.setText(Integer.toString(akcja1.getCoolDown()));
         typeComboBox.setValue(akcja1.getActionType());
         hotkeyComboBox.setValue(akcja1.getHotKey());
-        boolComboBox.setValue(akcja1.isActivated());
+        if(akcja1.isActivated()==true){
+            boolComboBox.setValue("On");
+        }else{
+            boolComboBox.setValue("Off");
+        }
     }
 
     public void deleteSelectedRow(ActionEvent e){
